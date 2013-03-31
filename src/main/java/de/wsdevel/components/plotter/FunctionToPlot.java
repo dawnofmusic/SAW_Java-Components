@@ -1,6 +1,7 @@
 package de.wsdevel.components.plotter;
 
 import java.awt.Color;
+import java.awt.Stroke;
 
 /**
  * Created on 26.05.2006.
@@ -16,6 +17,15 @@ public interface FunctionToPlot {
 	/**
 	 * COMMENT.
 	 * 
+	 * @param x
+	 *            <code>double</code>
+	 * @return <code>double</code>>
+	 */
+	double f(double x);
+
+	/**
+	 * COMMENT.
+	 * 
 	 * @return {@link Color }
 	 */
 	Color getColor();
@@ -23,11 +33,9 @@ public interface FunctionToPlot {
 	/**
 	 * COMMENT.
 	 * 
-	 * @param x
-	 *            <code>double</code>
-	 * @return <code>double</code>>
+	 * @return <code>float</code>
 	 */
-	double f(double x);
+	Stroke getStroke();
 
 }
 /*
