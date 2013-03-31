@@ -4,7 +4,7 @@
 
 	<groupId>de.wsdevel</groupId>
 	<artifactId>SAW_Java-Components</artifactId>
-	<version>0.1.10</version>
+	<version>0.1.11</version>
 	<packaging>jar</packaging>
 
 	<name>SAW_Java-Components</name>
