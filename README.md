@@ -3,6 +3,12 @@ SAW_Java-Components
 
 SAW_Java-Components is a framework for creating Java Swing Components that are extended by several interactive capabilities like dragging, support of selection rectangles and others.
 
+Current Version
+---------------
+
+0.1.11 Change Log: added listmodel support for tablemodel
+
+
 Download / Integrate
 --------------------
 
@@ -14,7 +20,7 @@ You can simply download or integrate this project via Maven. Just add the follow
 		<dependency>
 			<groupId>de.wsdevel</groupId>
 			<artifactId>SAW_Java-Components</artifactId>
-			<version>0.1.9</version>
+			<version>0.1.11</version>
 		</dependency>
 		...
 	</dependencies>
