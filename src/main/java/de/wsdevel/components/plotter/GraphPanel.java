@@ -148,6 +148,7 @@ public class GraphPanel extends JPanel {
 	 */
 	private int stepCountB = 5;
 
+	/** {@link GraphListener} The graphListener. */
 	private GraphListener graphListener;
 
 	/**
@@ -162,6 +163,12 @@ public class GraphPanel extends JPanel {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug(getSize());
 				}
+				repaint();
+			}
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+				updateScales();
 				repaint();
 			}
 		});
@@ -293,7 +300,7 @@ public class GraphPanel extends JPanel {
 	/**
 	 * COMMENT.
 	 * 
-	 * @return
+	 * @return {@link ValueTuple}
 	 */
 	private ValueTuple createFinalMax() {
 		if (getGraph() == null) {
@@ -424,7 +431,6 @@ public class GraphPanel extends JPanel {
 	 */
 	@Override
 	protected void paintComponent(final Graphics g) {
-
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
@@ -452,8 +458,8 @@ public class GraphPanel extends JPanel {
 
 		if (getGraph() != null) {
 			ValueTuple last = null;
-			final Iterator<ValueTuple> iterator = getGraph().getTuples()
-					.iterator();
+			final Iterator<ValueTuple> iterator = new LinkedList<ValueTuple>(
+					getGraph().getTuples()).iterator();
 			g.setColor(getGraph().getColor());
 			g2d.setStroke(new BasicStroke(getGraph().getStrokeWidth()));
 			while (iterator.hasNext()) {
@@ -466,7 +472,7 @@ public class GraphPanel extends JPanel {
 		}
 
 		final ValueTuple fvr = createFinalValueRange();
-		if (this.graph != null && fvr.getA() != 0 && fvr.getB() != 0) {
+		if (fvr.getA() != 0 && fvr.getB() != 0) {
 
 			final Iterator<FunctionToPlot> funcIt = this.functionsToPlot
 					.iterator();
@@ -546,6 +552,7 @@ public class GraphPanel extends JPanel {
 	 */
 	public final void setBackgroundTitle(final String backgroundTitleRef) {
 		this.backgroundTitle = backgroundTitleRef;
+		repaint();
 	}
 
 	/**
@@ -672,49 +679,49 @@ public class GraphPanel extends JPanel {
 	 * Updating scale factors.
 	 */
 	private void updateScales() {
-		if (this.graph == null) {
-			this.scaleX = 1;
-			this.scaleY = 1;
-		} else {
-			final ValueTuple vr = createFinalValueRange();
-			this.scaleX = (getWidth() - 1) / vr.getA();
-			// System.out.println(this.getClass().getSimpleName());// TODO
-			// remove
-			// // sysout
-			// System.out.println("vr a: " + vr.getA());// TODO remove sysout
-			// System.out.println("width: " + getWidth());// TODO remove sysout
-			this.scaleY = (getHeight() - 1) / vr.getB();
-			if (this.scaleX < 1) {
-				// System.out.println("scale is: " + scaleX);// TODO remove
-				// sysout
-				if (this.scaleY < 1) {
-					final Dimension preferredSize = new Dimension(
-							(int) Math.round(vr.getA() + 1),
-							(int) Math.round(vr.getB() + 1));
-					// System.out.println("1: " + preferredSize);// TODO remove
-					// // sysout
-					setPreferredSize(preferredSize);
-					setMinimumSize(preferredSize);
-					setSize(preferredSize);
-				} else {
-					final Dimension preferredSize = new Dimension(
-							(int) Math.round(vr.getA() + 1), getHeight());
-					// System.out.println("2: " + preferredSize);// TODO remove
-					// // sysout
-					setPreferredSize(preferredSize);
-					setMinimumSize(preferredSize);
-					setSize(preferredSize);
-				}
-			} else if (this.scaleY < 1) {
-				final Dimension preferredSize = new Dimension(getWidth(),
-						(int) Math.round(vr.getB() + 1));
-				// System.out.println("3: " + preferredSize);// TODO remove
-				// sysout
+		// if (this.graph == null) {
+		// this.scaleX = 1;
+		// this.scaleY = 1;
+		// } else {
+		final ValueTuple vr = createFinalValueRange();
+		this.scaleX = (getWidth() - 1) / vr.getA();
+		// System.out.println(this.getClass().getSimpleName());// TODO
+		// remove
+		// // sysout
+		// System.out.println("vr a: " + vr.getA());// TODO remove sysout
+		// System.out.println("width: " + getWidth());// TODO remove sysout
+		this.scaleY = (getHeight() - 1) / vr.getB();
+		if (this.scaleX < 1) {
+			// System.out.println("scale is: " + scaleX);// TODO remove
+			// sysout
+			if (this.scaleY < 1) {
+				final Dimension preferredSize = new Dimension(
+						(int) Math.round(vr.getA() + 1), (int) Math.round(vr
+								.getB() + 1));
+				// System.out.println("1: " + preferredSize);// TODO remove
+				// // sysout
+				setPreferredSize(preferredSize);
+				setMinimumSize(preferredSize);
+				setSize(preferredSize);
+			} else {
+				final Dimension preferredSize = new Dimension(
+						(int) Math.round(vr.getA() + 1), getHeight());
+				// System.out.println("2: " + preferredSize);// TODO remove
+				// // sysout
 				setPreferredSize(preferredSize);
 				setMinimumSize(preferredSize);
 				setSize(preferredSize);
 			}
+		} else if (this.scaleY < 1) {
+			final Dimension preferredSize = new Dimension(getWidth(),
+					(int) Math.round(vr.getB() + 1));
+			// System.out.println("3: " + preferredSize);// TODO remove
+			// sysout
+			setPreferredSize(preferredSize);
+			setMinimumSize(preferredSize);
+			setSize(preferredSize);
 		}
+		// }
 	}
 }
 //

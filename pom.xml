@@ -4,7 +4,7 @@
 
 	<groupId>de.wsdevel</groupId>
 	<artifactId>SAW_Java-Components</artifactId>
-	<version>0.1.11</version>
+	<version>0.1.12-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>SAW_Java-Components</name>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>de.wsdevel</groupId>
 			<artifactId>SAW_Java-Tools</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
