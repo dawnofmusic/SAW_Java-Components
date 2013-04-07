@@ -15,96 +15,96 @@ import javax.swing.event.ListDataListener;
  * @version $Author: sweissTFH $ -- $Revision: 1.1 $ -- $Date: 2005/10/26
  *          16:56:23 $
  */
-public abstract class AbstractTableModelOverListModel<T> extends
-		AbstractTableModelOverColumns implements TableModelOverListModel<T> {
+public abstract class AbstractTableModelOverListModel extends
+	AbstractTableModelOverColumns implements TableModelOverListModel {
 
-	/** {@link long} The serialVersionUID. */
-	private static final long serialVersionUID = 6833498331906253470L;
+    /** {@link long} The serialVersionUID. */
+    private static final long serialVersionUID = 6833498331906253470L;
 
-	/**
-	 * {@link ListModel}.
-	 */
-	private ListModel<T> listModel;
+    /**
+     * {@link ListModel}.
+     */
+    private ListModel listModel;
 
-	/**
-	 * COMMENT.
-	 * 
-	 * @param listModelVal
-	 *            {@link ListModel}
-	 */
-	public AbstractTableModelOverListModel(final ListModel<T> listModelVal) {
-		setListModel(listModelVal);
-	}
+    /**
+     * COMMENT.
+     * 
+     * @param listModelVal
+     *            {@link ListModel}
+     */
+    public AbstractTableModelOverListModel(final ListModel listModelVal) {
+	setListModel(listModelVal);
+    }
 
-	/**
-	 * {@link ListDataListener}.
-	 */
-	private ListDataListener listener;
+    /**
+     * {@link ListDataListener}.
+     */
+    private ListDataListener listener;
 
-	/**
-	 * COMMENT.
-	 * 
-	 * @return {@link ListDataListener}
-	 */
-	private ListDataListener getListDataListenerToInnerListModel() {
-		if (this.listener == null) {
-			this.listener = new ListDataListener() {
-				public void contentsChanged(final ListDataEvent e) {
-					fireTableRowsUpdated(e.getIndex0(), e.getIndex1());
-				}
-
-				public void intervalAdded(final ListDataEvent e) {
-					fireTableRowsInserted(e.getIndex0(), e.getIndex1());
-				}
-
-				public void intervalRemoved(final ListDataEvent e) {
-					fireTableRowsDeleted(e.getIndex0(), e.getIndex1());
-				}
-			};
+    /**
+     * COMMENT.
+     * 
+     * @return {@link ListDataListener}
+     */
+    private ListDataListener getListDataListenerToInnerListModel() {
+	if (this.listener == null) {
+	    this.listener = new ListDataListener() {
+		public void contentsChanged(final ListDataEvent e) {
+		    fireTableRowsUpdated(e.getIndex0(), e.getIndex1());
 		}
-		return this.listener;
-	}
 
-	/**
-	 * COMMENT.
-	 * 
-	 * @param inner
-	 *            {@link ListModel}
-	 */
-	public final void setListModel(final ListModel<T> inner) {
-		if (this.listModel != null) {
-			if (getRowCount() > 0) {
-				fireTableRowsDeleted(0, getRowCount() - 1);
-			}
-			this.listModel
-					.removeListDataListener(getListDataListenerToInnerListModel());
-			this.listModel = null;
+		public void intervalAdded(final ListDataEvent e) {
+		    fireTableRowsInserted(e.getIndex0(), e.getIndex1());
 		}
-		this.listModel = inner;
-		this.listModel
-				.addListDataListener(getListDataListenerToInnerListModel());
-		if (getRowCount() > 0) {
-			fireTableRowsInserted(0, getRowCount() - 1);
+
+		public void intervalRemoved(final ListDataEvent e) {
+		    fireTableRowsDeleted(e.getIndex0(), e.getIndex1());
 		}
+	    };
 	}
+	return this.listener;
+    }
 
-	// methods depending on underlying data structure -------------------------
-
-	/**
-	 * @return <code>int</code>
-	 * @see javax.swing.table.TableModel#getRowCount()
-	 */
-	public final int getRowCount() {
-		return this.listModel.getSize();
+    /**
+     * COMMENT.
+     * 
+     * @param inner
+     *            {@link ListModel}
+     */
+    public final void setListModel(final ListModel inner) {
+	if (this.listModel != null) {
+	    if (getRowCount() > 0) {
+		fireTableRowsDeleted(0, getRowCount() - 1);
+	    }
+	    this.listModel
+		    .removeListDataListener(getListDataListenerToInnerListModel());
+	    this.listModel = null;
 	}
-
-	/**
-	 * @return {@link ListModel}
-	 * @see de.wsdevel.tools.awt.components.table.TableModelOverListModel#getListModel()
-	 */
-	public final ListModel<T> getListModel() {
-		return this.listModel;
+	this.listModel = inner;
+	this.listModel
+		.addListDataListener(getListDataListenerToInnerListModel());
+	if (getRowCount() > 0) {
+	    fireTableRowsInserted(0, getRowCount() - 1);
 	}
+    }
+
+    // methods depending on underlying data structure -------------------------
+
+    /**
+     * @return <code>int</code>
+     * @see javax.swing.table.TableModel#getRowCount()
+     */
+    public final int getRowCount() {
+	return this.listModel.getSize();
+    }
+
+    /**
+     * @return {@link ListModel}
+     * @see de.wsdevel.tools.awt.components.table.TableModelOverListModel#getListModel()
+     */
+    public final ListModel getListModel() {
+	return this.listModel;
+    }
 
 }
 /*

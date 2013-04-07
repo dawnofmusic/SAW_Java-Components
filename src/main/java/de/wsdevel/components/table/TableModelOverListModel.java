@@ -13,17 +13,15 @@ import javax.swing.table.TableModel;
  * @author <a href="mailto:post@sebastian-weiss.de">Sebastian A. Weiss</a>
  * @version $Author: sweissTFH $ -- $Revision: 1.2 $ -- $Date: 2005/10/26
  *          16:56:23 $
- * 
- * @param T
  */
-public interface TableModelOverListModel<T> extends TableModel {
+public interface TableModelOverListModel extends TableModel {
 
-	/**
-	 * COMMENT.
-	 * 
-	 * @return {@link ListModel}
-	 */
-	ListModel<T> getListModel();
+    /**
+     * COMMENT.
+     * 
+     * @return {@link ListModel}
+     */
+    ListModel getListModel();
 }
 /*
  * $Log: TableModelOverListModel.java,v $ Revision 1.2 2006-11-02 11:25:49
