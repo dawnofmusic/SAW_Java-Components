@@ -1,7 +1,7 @@
 package de.wsdevel.components.plotter;
 
 import java.awt.Color;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -18,192 +18,219 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Graph {
 
-	/**
-	 * {@link Log} the logger.
-	 */
-	private static final Log LOG = LogFactory.getLog(Graph.class);
+    /**
+     * {@link Log} the logger.
+     */
+    private static final Log LOG = LogFactory.getLog(Graph.class);
 
-	/**
-	 * {@link SortedSet<Double>} COMMENT.
-	 */
-	private SortedSet<Double> as = new TreeSet<Double>();
+    /** {@link int} The maxNumberOfValues. */
+    private int maxNumberOfValues = -1;
 
-	/**
-	 * {@link SortedSet<Double>} COMMENT.
-	 */
-	private SortedSet<Double> bs = new TreeSet<Double>();
+    /**
+     * {@link SortedSet<Double>} COMMENT.
+     */
+    private final SortedSet<Double> as = new TreeSet<Double>();
 
-	/**
-	 * {@link Color} COMMENT.
-	 */
-	private Color color = Color.BLACK;
+    /**
+     * {@link SortedSet<Double>} COMMENT.
+     */
+    private final SortedSet<Double> bs = new TreeSet<Double>();
 
-	/**
-	 * {@link GraphListenerSupport} COMMENT.
-	 */
-	private GraphListenerSupport gls = new GraphListenerSupport();
+    /**
+     * {@link Color} COMMENT.
+     */
+    private Color color = Color.BLACK;
 
-	/**
-	 * {@link float} COMMENT.
-	 */
-	private float strokeWidth = 1.0f;
+    /**
+     * {@link GraphListenerSupport} COMMENT.
+     */
+    private final GraphListenerSupport gls = new GraphListenerSupport();
 
-	/**
-	 * {@link ArrayList<ValueTuple>} COMMENT.
-	 */
-	private ArrayList<ValueTuple> tuples = new ArrayList<ValueTuple>();
+    /**
+     * {@link float} COMMENT.
+     */
+    private float strokeWidth = 1.0f;
 
-	/**
-	 * @param listener
-	 *            {@link GraphListener}
-	 * @see de.wsdevel.components.plotter.GraphListenerSupport#addListener(de.wsdevel.components.plotter.GraphListener)
-	 */
-	public final void addListener(final GraphListener listener) {
-		this.gls.addListener(listener);
+    /**
+     * {@link LinkedList<ValueTuple>} COMMENT.
+     */
+    private LinkedList<ValueTuple> tuples = new LinkedList<ValueTuple>();
+
+    /**
+     * @param listener
+     *            {@link GraphListener}
+     * @see de.wsdevel.components.plotter.GraphListenerSupport#addListener(de.wsdevel.components.plotter.GraphListener)
+     */
+    public final void addListener(final GraphListener listener) {
+	this.gls.addListener(listener);
+    }
+
+    /**
+     * @param tuple
+     *            {@link ValueTuple}
+     */
+    @SuppressWarnings("nls")
+    public final void addTuple(final ValueTuple tuple) {
+	this.tuples.add(tuple);
+	this.as.add(tuple.getA());
+	this.bs.add(tuple.getB());
+	if (Graph.LOG.isDebugEnabled()) {
+	    Graph.LOG.debug("tuple added: " + tuple);
 	}
-
-	/**
-	 * @param tuple
-	 *            {@link ValueTuple}
-	 */
-	@SuppressWarnings("nls")
-	public final void addTuple(final ValueTuple tuple) {
-		this.tuples.add(tuple);
-		this.as.add(tuple.getA());
-		this.bs.add(tuple.getB());
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("tuple added: " + tuple);
-		}
-		this.gls.fireGraphChanged();
+	if (getMaxNumberOfValues() > -1
+		&& this.tuples.size() > getMaxNumberOfValues()) {
+	    ValueTuple first = this.tuples.pollFirst();
+	    // SEBASTIAN what about the as and bs?
 	}
+	this.gls.fireGraphChanged();
+    }
 
-	/**
-	 * @return {@link Color} the color.
-	 */
-	public final Color getColor() {
-		return this.color;
-	}
+    /**
+     * @return {@link Color} the color.
+     */
+    public final Color getColor() {
+	return this.color;
+    }
 
-	/**
-	 * COMMENT.
-	 * 
-	 * @return <code>double</code>
-	 */
-	public final double getDeltaA() {
-		return getMaxA() - getMinA();
-	}
+    /**
+     * COMMENT.
+     * 
+     * @return <code>double</code>
+     */
+    public final double getDeltaA() {
+	return getMaxA() - getMinA();
+    }
 
-	/**
-	 * COMMENT.
-	 * 
-	 * @return <code>double</code>
-	 */
-	public final double getDeltaB() {
-		return getMaxB() - getMinB();
-	}
+    /**
+     * COMMENT.
+     * 
+     * @return <code>double</code>
+     */
+    public final double getDeltaB() {
+	return getMaxB() - getMinB();
+    }
 
-	/**
-	 * @return <code>double</code>
-	 */
-	public final double getMaxA() {
-		if (this.as.size() > 0) {
-			final Double last = this.as.last();
-			if (last == null) {
-				return 0;
-			}
-			return last;
-		}
+    /**
+     * @return <code>double</code>
+     */
+    public final double getMaxA() {
+	if (this.as.size() > 0) {
+	    final Double last = this.as.last();
+	    if (last == null) {
 		return 0;
+	    }
+	    return last;
 	}
+	return 0;
+    }
 
-	/**
-	 * @return <code>double</code>
-	 */
-	public final double getMaxB() {
-		if (this.bs.size() > 0) {
-			final Double last = this.bs.last();
-			if (last == null) {
-				return 0;
-			}
-			return last;
-		}
+    /**
+     * @return <code>double</code>
+     */
+    public final double getMaxB() {
+	if (this.bs.size() > 0) {
+	    final Double last = this.bs.last();
+	    if (last == null) {
 		return 0;
+	    }
+	    return last;
 	}
+	return 0;
+    }
 
-	/**
-	 * @return <code>double</code>
-	 */
-	public final double getMinA() {
-		if (this.as.size() > 0) {
-			final Double first = this.as.first();
-			if (first == null) {
-				return 0;
-			}
-			return first;
-		}
+    /**
+     * Returns the maxNumberOfValues.
+     * 
+     * @return {@link int}
+     */
+    public int getMaxNumberOfValues() {
+	return this.maxNumberOfValues;
+    }
+
+    /**
+     * @return <code>double</code>
+     */
+    public final double getMinA() {
+	if (this.as.size() > 0) {
+	    final Double first = this.as.first();
+	    if (first == null) {
 		return 0;
+	    }
+	    return first;
 	}
+	return 0;
+    }
 
-	/**
-	 * @return <code>double</code>
-	 */
-	public final double getMinB() {
-		if (this.bs.size() > 0) {
-			final Double first = this.bs.first();
-			if (first == null) {
-				return 0;
-			}
-			return first;
-		}
+    /**
+     * @return <code>double</code>
+     */
+    public final double getMinB() {
+	if (this.bs.size() > 0) {
+	    final Double first = this.bs.first();
+	    if (first == null) {
 		return 0;
+	    }
+	    return first;
 	}
+	return 0;
+    }
 
-	/**
-	 * @return {@link float} the strokeWidth.
-	 */
-	public final float getStrokeWidth() {
-		return this.strokeWidth;
-	}
+    /**
+     * @return {@link float} the strokeWidth.
+     */
+    public final float getStrokeWidth() {
+	return this.strokeWidth;
+    }
 
-	/**
-	 * @return {@link ArrayList<ValueTuple>} the tuples.
-	 */
-	public final ArrayList<ValueTuple> getTuples() {
-		return this.tuples;
-	}
+    /**
+     * @return {@link LinkedList<ValueTuple>} the tuples.
+     */
+    public final LinkedList<ValueTuple> getTuples() {
+	return this.tuples;
+    }
 
-	/**
-	 * @param listener
-	 *            {@link GraphListener}
-	 * @see de.wsdevel.components.plotter.GraphListenerSupport#removeListener(de.wsdevel.components.plotter.GraphListener)
-	 */
-	public final void removeListener(final GraphListener listener) {
-		this.gls.removeListener(listener);
-	}
+    /**
+     * @param listener
+     *            {@link GraphListener}
+     * @see de.wsdevel.components.plotter.GraphListenerSupport#removeListener(de.wsdevel.components.plotter.GraphListener)
+     */
+    public final void removeListener(final GraphListener listener) {
+	this.gls.removeListener(listener);
+    }
 
-	/**
-	 * @param colorRef
-	 *            {@link Color} the color to set.
-	 */
-	public final void setColor(final Color colorRef) {
-		this.color = colorRef;
-	}
+    /**
+     * @param colorRef
+     *            {@link Color} the color to set.
+     */
+    public final void setColor(final Color colorRef) {
+	this.color = colorRef;
+    }
 
-	/**
-	 * @param strokeWidthVal
-	 *            {@link float} the strokeWidth to set.
-	 */
-	public final void setStrokeWidth(final float strokeWidthVal) {
-		this.strokeWidth = strokeWidthVal;
-	}
+    /**
+     * Sets the maxNumberOfValues.
+     * 
+     * @param maxNumberOfValues
+     *            {@link int}
+     */
+    public void setMaxNumberOfValues(final int maxNumberOfValues) {
+	this.maxNumberOfValues = maxNumberOfValues;
+    }
 
-	/**
-	 * @param tuplesRef
-	 *            {@link ArrayList<ValueTuple>} the tuples to set.
-	 */
-	public final void setTuples(final ArrayList<ValueTuple> tuplesRef) {
-		this.tuples = tuplesRef;
-	}
+    /**
+     * @param strokeWidthVal
+     *            {@link float} the strokeWidth to set.
+     */
+    public final void setStrokeWidth(final float strokeWidthVal) {
+	this.strokeWidth = strokeWidthVal;
+    }
+
+    /**
+     * @param tuplesRef
+     *            {@link LinkedList<ValueTuple>} the tuples to set.
+     */
+    public final void setTuples(final LinkedList<ValueTuple> tuplesRef) {
+	this.tuples = tuplesRef;
+    }
 
 }
 //
