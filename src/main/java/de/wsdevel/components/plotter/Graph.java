@@ -41,6 +41,9 @@ public class Graph {
      */
     private Color color = Color.BLACK;
 
+    /** {@link Color} The fillColor. */
+    private Color fillColor = new Color(200, 200, 200, 50);
+
     /**
      * {@link GraphListenerSupport} COMMENT.
      */
@@ -77,10 +80,14 @@ public class Graph {
 	if (Graph.LOG.isDebugEnabled()) {
 	    Graph.LOG.debug("tuple added: " + tuple);
 	}
-	if (getMaxNumberOfValues() > -1
-		&& this.tuples.size() > getMaxNumberOfValues()) {
-	    ValueTuple first = this.tuples.pollFirst();
+	if ((getMaxNumberOfValues() > -1)
+		&& (this.tuples.size() > getMaxNumberOfValues())) {
 	    // SEBASTIAN what about the as and bs?
+	    // assume as are always increasing, at least remove a
+	    if (!this.as.remove(this.tuples.pollFirst().getA())) {
+		// System.out.println("[first: " + first.getA() + ", as: "
+		// + this.as + ", tuples: " + this.tuples + "]");
+	    }
 	}
 	this.gls.fireGraphChanged();
     }
@@ -108,6 +115,15 @@ public class Graph {
      */
     public final double getDeltaB() {
 	return getMaxB() - getMinB();
+    }
+
+    /**
+     * Returns the fillColor.
+     * 
+     * @return {@link Color}
+     */
+    public Color getFillColor() {
+	return this.fillColor;
     }
 
     /**
@@ -204,6 +220,16 @@ public class Graph {
      */
     public final void setColor(final Color colorRef) {
 	this.color = colorRef;
+    }
+
+    /**
+     * Sets the fillColor.
+     * 
+     * @param fillColor
+     *            {@link Color}
+     */
+    public void setFillColor(final Color fillColor) {
+	this.fillColor = fillColor;
     }
 
     /**
