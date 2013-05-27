@@ -461,6 +461,7 @@ public class GraphPanel extends JPanel {
      * 
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected void paintComponent(final Graphics g) {
 	final Graphics2D g2d = (Graphics2D) g;
@@ -489,21 +490,27 @@ public class GraphPanel extends JPanel {
 	g.drawLine(0, origin.y, getWidth(), origin.y);
 	g.drawLine(origin.x, 0, origin.x, getHeight());
 
-	if (getGraph() != null) {
-	    ValueTuple last = null;
-	    final Iterator<ValueTuple> iterator = new LinkedList<ValueTuple>(
-		    getGraph().getTuples()).iterator();
-	    g.setColor(getGraph().getColor());
-	    g2d.setStroke(new BasicStroke(getGraph().getStrokeWidth()));
-	    while (iterator.hasNext()) {
-		final ValueTuple next = iterator.next();
-		if (last != null) {
-		    paintPart(g, last, next, origin, offset);
+	try {
+	    if (getGraph() != null) {
+		ValueTuple last = null;
+		final Iterator<ValueTuple> iterator;
+		synchronized (getGraph().getTuples()) {
+		    iterator = ((LinkedList<ValueTuple>) getGraph().getTuples()
+			    .clone()).iterator();
 		}
-		last = next;
+		g.setColor(getGraph().getColor());
+		g2d.setStroke(new BasicStroke(getGraph().getStrokeWidth()));
+		while (iterator.hasNext()) {
+		    final ValueTuple next = iterator.next();
+		    if (last != null) {
+			paintPart(g, last, next, origin, offset);
+		    }
+		    last = next;
+		}
 	    }
+	} catch (Throwable t) {
+	    LOG.error(t.getLocalizedMessage(), t);
 	}
-
 	final ValueTuple fvr = createFinalValueRange();
 	if ((fvr.getA() != 0) && (fvr.getB() != 0)) {
 
