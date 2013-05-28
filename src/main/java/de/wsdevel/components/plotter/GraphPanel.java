@@ -49,7 +49,7 @@ public class GraphPanel extends JPanel {
      * {@link Font} COMMENT.
      */
     @SuppressWarnings("nls")
-    private static final Font DEFAULT_FONT = new Font("sanserif", Font.PLAIN,
+    private static final Font DEFAULT_FONT = new Font("sansserif", Font.PLAIN,
 	    10);
 
     /**
@@ -120,15 +120,17 @@ public class GraphPanel extends JPanel {
      */
     private Graph graph = null;
 
-    /**
-     * {@link ValueTuple} COMMENT.
-     */
-    private ValueTuple maxValues;
+    /** {@link Double} maximum value of a. */
+    private Double maxA = null;
 
-    /**
-     * {@link ValueTuple} COMMENT.
-     */
-    private ValueTuple minValues;
+    /** {@link Double} maximum value of b. */
+    private Double maxB = null;
+
+    /** {@link Double} minimum value of a. */
+    private Double minA = null;
+
+    /** {@link Double} minimum value of b. */
+    private Double minB = null;
 
     /**
      * <code>double</code> COMMENT.
@@ -307,23 +309,16 @@ public class GraphPanel extends JPanel {
      */
     private ValueTuple createFinalMax() {
 	if (getGraph() == null) {
-	    if (getMaxValues() != null) {
-		return new ValueTuple(getMaxValues().getA(), getMaxValues()
-			.getB());
-	    }
-	    return new ValueTuple(1, 1);
+	    return new ValueTuple(getMaxA() != null ? getMaxA() : 1,
+		    getMaxB() != null ? getMaxB() : 1);
 	}
 	final ValueTuple finalMax = new ValueTuple(getGraph().getMaxA(),
 		getGraph().getMaxB());
-	if (getMaxValues() != null) {
-	    final double a = getMaxValues().getA();
-	    if (a > getGraph().getMaxA()) {
-		finalMax.setA(a);
-	    }
-	    final double b = getMaxValues().getB();
-	    if (b > getGraph().getMaxB()) {
-		finalMax.setB(b);
-	    }
+	if ((getMaxA() != null) && (getMaxA() > getGraph().getMaxA())) {
+	    finalMax.setA(getMaxA());
+	}
+	if ((getMaxB() != null) && (getMaxB() > getGraph().getMaxB())) {
+	    finalMax.setB(getMaxB());
 	}
 	return finalMax;
     }
@@ -333,23 +328,16 @@ public class GraphPanel extends JPanel {
      */
     private ValueTuple createFinalMin() {
 	if (getGraph() == null) {
-	    if (getMinValues() != null) {
-		return new ValueTuple(getMinValues().getA(), getMinValues()
-			.getB());
-	    }
-	    return new ValueTuple(0, 0);
+	    return new ValueTuple(getMinA() != null ? getMinA() : 1,
+		    getMinB() != null ? getMinB() : 1);
 	}
 	final ValueTuple finalMin = new ValueTuple(getGraph().getMinA(),
 		getGraph().getMinB());
-	if (getMinValues() != null) {
-	    final double a = getMinValues().getA();
-	    if (a < getGraph().getMinA()) {
-		finalMin.setA(a);
-	    }
-	    final double b = getMinValues().getB();
-	    if (b < getGraph().getMinB()) {
-		finalMin.setB(b);
-	    }
+	if ((getMinA() != null) && (getMinA() < getGraph().getMinA())) {
+	    finalMin.setA(getMinA());
+	}
+	if ((getMaxB() != null) && (getMinB() < getGraph().getMinB())) {
+	    finalMin.setB(getMinB());
 	}
 	return finalMin;
     }
@@ -428,18 +416,26 @@ public class GraphPanel extends JPanel {
 	return this.graph;
     }
 
-    /**
-     * @return {@link ValueTuple} the maxValues.
-     */
-    public final ValueTuple getMaxValues() {
-	return this.maxValues;
+    public Double getMaxA() {
+	return this.maxA;
+    }
+
+    public Double getMaxB() {
+	return this.maxB;
     }
 
     /**
-     * @return {@link ValueTuple} the minValues.
+     * @return {@link Double}
      */
-    public final ValueTuple getMinValues() {
-	return this.minValues;
+    public Double getMinA() {
+	return this.minA;
+    }
+
+    /**
+     * @return {@link Double}
+     */
+    public Double getMinB() {
+	return this.minB;
     }
 
     /**
@@ -508,8 +504,8 @@ public class GraphPanel extends JPanel {
 		    last = next;
 		}
 	    }
-	} catch (Throwable t) {
-	    LOG.error(t.getLocalizedMessage(), t);
+	} catch (final Throwable t) {
+	    GraphPanel.LOG.error(t.getLocalizedMessage(), t);
 	}
 	final ValueTuple fvr = createFinalValueRange();
 	if ((fvr.getA() != 0) && (fvr.getB() != 0)) {
@@ -656,19 +652,35 @@ public class GraphPanel extends JPanel {
     }
 
     /**
-     * @param maxValuesRef
-     *            {@link ValueTuple} the maxValues to set.
+     * @param maxX
+     *            {@link Double}
      */
-    public final void setMaxValues(final ValueTuple maxValuesRef) {
-	this.maxValues = maxValuesRef;
+    public void setMaxA(final Double maxX) {
+	this.maxA = maxX;
     }
 
     /**
-     * @param minValuesRef
-     *            {@link ValueTuple} the minValues to set.
+     * @param maxY
+     *            {@link Double}
      */
-    public final void setMinValues(final ValueTuple minValuesRef) {
-	this.minValues = minValuesRef;
+    public void setMaxB(final Double maxY) {
+	this.maxB = maxY;
+    }
+
+    /**
+     * @param minX
+     *            {@link Double}
+     */
+    public void setMinA(final Double minX) {
+	this.minA = minX;
+    }
+
+    /**
+     * @param minY
+     *            {@link Double}
+     */
+    public void setMinB(final Double minY) {
+	this.minB = minY;
     }
 
     /**
