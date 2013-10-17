@@ -29,9 +29,28 @@ You can simply download or integrate this project via Maven. Just add the follow
 	<repositories>
 		...
 		<repository>
-			<id>sebastian-weiss</id>
-			<name>Sebastian's Repository</name>
-			<url>http://www.sebastian-weiss.de/mvn-repo</url>
+			<id>sebastian-weiss-snapshot</id>
+			<name>Sebastian's Snapshot Repository</name>
+			<url>http://www.sebastian-weiss.de/mvn-repo/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>sebastian-weiss-release</id>
+			<name>Sebastian's Release Repository</name>
+			<url>http://www.sebastian-weiss.de/mvn-repo/releases</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		...
 	</repositories>
