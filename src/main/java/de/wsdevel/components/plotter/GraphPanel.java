@@ -16,7 +16,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -361,22 +360,22 @@ public class GraphPanel extends JPanel {
 	return new GraphListener() {
 	    @Override
 	    public void graphChanged() {
-		try {
-		    SwingUtilities.invokeAndWait(new Runnable() {
-			@Override
-			public void run() {
-			    updateForNewGraph(GraphPanel.this.graph);
-			    updateScales();
-			    repaint();
-			}
-		    });
-		} catch (final InterruptedException e) {
-		    GraphPanel.LOG.error(e.getLocalizedMessage(),
-			    GraphPanel.LOG.isDebugEnabled() ? e : null);
-		} catch (final InvocationTargetException e) {
-		    GraphPanel.LOG.error(e.getLocalizedMessage(),
-			    GraphPanel.LOG.isDebugEnabled() ? e : null);
-		}
+		// try {
+		SwingUtilities.invokeLater(new Runnable() {
+		    @Override
+		    public void run() {
+			updateForNewGraph(GraphPanel.this.graph);
+			updateScales();
+			repaint();
+		    }
+		});
+		// } catch (final InterruptedException e) {
+		// GraphPanel.LOG.error(e.getLocalizedMessage(),
+		// GraphPanel.LOG.isDebugEnabled() ? e : null);
+		// } catch (final InvocationTargetException e) {
+		// GraphPanel.LOG.error(e.getLocalizedMessage(),
+		// GraphPanel.LOG.isDebugEnabled() ? e : null);
+		// }
 	    }
 	};
     }
