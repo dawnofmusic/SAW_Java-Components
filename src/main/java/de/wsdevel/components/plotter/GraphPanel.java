@@ -16,6 +16,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -205,7 +206,7 @@ public class GraphPanel extends JPanel {
 	    public void componentResized(final ComponentEvent e) {
 		updateScales();
 		if (GraphPanel.LOG.isDebugEnabled()) {
-		    GraphPanel.LOG.debug(getSize());
+		    GraphPanel.LOG.debug("GraphPanel resized to " + getSize()); //$NON-NLS-1$
 		}
 		repaint();
 	    }
@@ -293,6 +294,8 @@ public class GraphPanel extends JPanel {
 		this.graphListener = createGraphListener(graphRef);
 	    }
 	    graphRef.addListener(this.graphListener);
+	    getGraphs().add(graphRef);
+
 	    final Dimension size = getVisibleRect().getSize();
 	    setMinimumSize(new Dimension(100, 100));
 	    setPreferredSize(size);
@@ -377,7 +380,8 @@ public class GraphPanel extends JPanel {
 	    return new ValueTuple(getMaxA() != null ? getMaxA() : 1,
 		    getMaxB() != null ? getMaxB() : 1);
 	}
-	ValueTuple finalMax = new ValueTuple(getMaxA(), getMaxB());
+	ValueTuple finalMax = new ValueTuple(getMaxA() != null ? getMaxA() : 1,
+		getMaxB() != null ? getMaxB() : 1);
 	final LinkedList<Graph> graphs2 = getGraphs();
 	for (final Graph graph : graphs2) {
 	    finalMax = createFinalMaxForGraph(finalMax, graph);
@@ -390,10 +394,11 @@ public class GraphPanel extends JPanel {
      */
     private ValueTuple createFinalMin() {
 	if ((getGraphs() == null) || getGraphs().isEmpty()) {
-	    return new ValueTuple(getMinA() != null ? getMinA() : 1,
-		    getMinB() != null ? getMinB() : 1);
+	    return new ValueTuple(getMinA() != null ? getMinA() : 0,
+		    getMinB() != null ? getMinB() : 0);
 	}
-	ValueTuple finalMin = new ValueTuple(getMinA(), getMinB());
+	ValueTuple finalMin = new ValueTuple(getMinA() != null ? getMinA() : 0,
+		getMinB() != null ? getMinB() : 0);
 	final LinkedList<Graph> graphs2 = getGraphs();
 	for (final Graph graph : graphs2) {
 	    finalMin = createFinalMinForGraph(finalMin, graph);
@@ -407,8 +412,13 @@ public class GraphPanel extends JPanel {
     private ValueTuple createFinalValueRange() {
 	final ValueTuple fmax = createFinalMax();
 	final ValueTuple fmin = createFinalMin();
-	return new ValueTuple(fmax.getA() - fmin.getA(), fmax.getB()
-		- fmin.getB());
+	final ValueTuple range = new ValueTuple(fmax.getA() - fmin.getA(),
+		fmax.getB() - fmin.getB());
+	if (LOG.isDebugEnabled()) {
+	    LOG.debug("range calculation [fmax: " + fmax + ", fmin: " + fmin //$NON-NLS-1$ //$NON-NLS-2$
+		    + ", range: " + range + "]."); //$NON-NLS-1$//$NON-NLS-2$
+	}
+	return range;
     }
 
     /**
@@ -420,22 +430,22 @@ public class GraphPanel extends JPanel {
 	return new GraphListener() {
 	    @Override
 	    public void graphChanged() {
-		// try {
-		SwingUtilities.invokeLater(new Runnable() {
-		    @Override
-		    public void run() {
-			updateForNewGraph(graphRef);
-			updateScales();
-			repaint();
-		    }
-		});
-		// } catch (final InterruptedException e) {
-		// GraphPanel.LOG.error(e.getLocalizedMessage(),
-		// GraphPanel.LOG.isDebugEnabled() ? e : null);
-		// } catch (final InvocationTargetException e) {
-		// GraphPanel.LOG.error(e.getLocalizedMessage(),
-		// GraphPanel.LOG.isDebugEnabled() ? e : null);
-		// }
+		try {
+		    SwingUtilities.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+			    updateForNewGraph(graphRef);
+			    updateScales();
+			    repaint();
+			}
+		    });
+		} catch (final InterruptedException e) {
+		    GraphPanel.LOG.error(e.getLocalizedMessage(),
+			    GraphPanel.LOG.isDebugEnabled() ? e : null);
+		} catch (final InvocationTargetException e) {
+		    GraphPanel.LOG.error(e.getLocalizedMessage(),
+			    GraphPanel.LOG.isDebugEnabled() ? e : null);
+		}
 	    }
 	};
     }
@@ -474,13 +484,6 @@ public class GraphPanel extends JPanel {
     public LinkedList<Graph> getGraphs() {
 	return this.graphs;
     }
-
-    // /**
-    // * @return {@link Graph} the graph.
-    // */
-    // public final Graph getGraph() {
-    // return this.graph;
-    // }
 
     public Double getMaxA() {
 	return this.maxA;

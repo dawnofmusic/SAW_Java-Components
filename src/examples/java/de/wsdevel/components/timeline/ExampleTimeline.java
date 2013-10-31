@@ -32,7 +32,7 @@ import de.wsdevel.tools.awt.GUIToolkit;
  *          reserved.
  * 
  */
-public class AppTestTimeline {
+public class ExampleTimeline {
 
     /**
      * @param args
