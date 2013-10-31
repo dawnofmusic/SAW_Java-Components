@@ -95,6 +95,42 @@ public class GraphPanel extends JPanel {
     public static final BasicStroke SIMPLE_STROKE = new BasicStroke(1f);
 
     /**
+     * @param panelConstraints
+     * @param graphRef
+     * @return
+     */
+    private static ValueTuple createFinalMaxForGraph(
+	    final ValueTuple panelConstraints, final Graph graphRef) {
+	final ValueTuple finalMax = new ValueTuple(graphRef.getMaxA(),
+		graphRef.getMaxB());
+	if (panelConstraints.getA() > graphRef.getMaxA()) {
+	    finalMax.setA(panelConstraints.getA());
+	}
+	if (panelConstraints.getB() > graphRef.getMaxB()) {
+	    finalMax.setB(panelConstraints.getB());
+	}
+	return finalMax;
+    }
+
+    /**
+     * @param panelConstraints
+     * @param graphRef
+     * @return
+     */
+    private static ValueTuple createFinalMinForGraph(
+	    final ValueTuple panelConstraints, final Graph graphRef) {
+	final ValueTuple finalMin = new ValueTuple(graphRef.getMinA(),
+		graphRef.getMinB());
+	if (panelConstraints.getA() < graphRef.getMinA()) {
+	    finalMin.setA(panelConstraints.getA());
+	}
+	if (panelConstraints.getB() < graphRef.getMinB()) {
+	    finalMin.setB(panelConstraints.getB());
+	}
+	return finalMin;
+    }
+
+    /**
      * {@link String} COMMENT.
      */
     private String backgroundTitle = ""; //$NON-NLS-1$
@@ -103,6 +139,11 @@ public class GraphPanel extends JPanel {
      * {@link Formatter} COMMENT.
      */
     private Formatter formaterA = GraphPanel.DEFAULT_FORMATTER;
+
+    // /**
+    // * {@link Graph} COMMENT.
+    // */
+    // private Graph graph = null;
 
     /**
      * {@link Formatter} COMMENT.
@@ -114,10 +155,13 @@ public class GraphPanel extends JPanel {
      */
     private LinkedList<FunctionToPlot> functionsToPlot = new LinkedList<FunctionToPlot>();
 
+    /** {@link GraphListener} The graphListener. */
+    private GraphListener graphListener;
+
     /**
-     * {@link Graph} COMMENT.
+     * {@link LinkedList}< {@link Graph}> graphs.
      */
-    private Graph graph = null;
+    private LinkedList<Graph> graphs = new LinkedList<Graph>();
 
     /** {@link Double} maximum value of a. */
     private Double maxA = null;
@@ -150,9 +194,6 @@ public class GraphPanel extends JPanel {
      * <code>int</code> COMMENT.
      */
     private int stepCountB = 5;
-
-    /** {@link GraphListener} The graphListener. */
-    private GraphListener graphListener;
 
     /**
      * Default constructor.
@@ -224,7 +265,7 @@ public class GraphPanel extends JPanel {
      */
     public GraphPanel(final Graph graphRef) {
 	this();
-	setGraph(graphRef);
+	addGraph(graphRef);
     }
 
     /**
@@ -235,6 +276,31 @@ public class GraphPanel extends JPanel {
      */
     public final void addFunctionToPlot(final FunctionToPlot functionToPlot) {
 	this.functionsToPlot.add(functionToPlot);
+    }
+
+    /**
+     * @param graphRef
+     *            {@link Graph} the graph to set.
+     */
+    public final void addGraph(final Graph graphRef) {
+	// if (this.graph != null) {
+	// this.graph.removeListener(this.graphListener);
+	// this.graph = null;
+	// }
+	// this.graph = graphRef;
+	if (graphRef != null) {
+	    if (this.graphListener == null) {
+		this.graphListener = createGraphListener(graphRef);
+	    }
+	    graphRef.addListener(this.graphListener);
+	    final Dimension size = getVisibleRect().getSize();
+	    setMinimumSize(new Dimension(100, 100));
+	    setPreferredSize(size);
+	    setSize(size);
+	    updateForNewGraph(graphRef);
+	    updateScales();
+	    repaint();
+	}
     }
 
     /**
@@ -307,17 +373,14 @@ public class GraphPanel extends JPanel {
      * @return {@link ValueTuple}
      */
     private ValueTuple createFinalMax() {
-	if (getGraph() == null) {
+	if ((getGraphs() == null) || getGraphs().isEmpty()) {
 	    return new ValueTuple(getMaxA() != null ? getMaxA() : 1,
 		    getMaxB() != null ? getMaxB() : 1);
 	}
-	final ValueTuple finalMax = new ValueTuple(getGraph().getMaxA(),
-		getGraph().getMaxB());
-	if ((getMaxA() != null) && (getMaxA() > getGraph().getMaxA())) {
-	    finalMax.setA(getMaxA());
-	}
-	if ((getMaxB() != null) && (getMaxB() > getGraph().getMaxB())) {
-	    finalMax.setB(getMaxB());
+	ValueTuple finalMax = new ValueTuple(getMaxA(), getMaxB());
+	final LinkedList<Graph> graphs2 = getGraphs();
+	for (final Graph graph : graphs2) {
+	    finalMax = createFinalMaxForGraph(finalMax, graph);
 	}
 	return finalMax;
     }
@@ -326,17 +389,14 @@ public class GraphPanel extends JPanel {
      * @return {@link ValueTuple}
      */
     private ValueTuple createFinalMin() {
-	if (getGraph() == null) {
+	if ((getGraphs() == null) || getGraphs().isEmpty()) {
 	    return new ValueTuple(getMinA() != null ? getMinA() : 1,
 		    getMinB() != null ? getMinB() : 1);
 	}
-	final ValueTuple finalMin = new ValueTuple(getGraph().getMinA(),
-		getGraph().getMinB());
-	if ((getMinA() != null) && (getMinA() < getGraph().getMinA())) {
-	    finalMin.setA(getMinA());
-	}
-	if ((getMaxB() != null) && (getMinB() < getGraph().getMinB())) {
-	    finalMin.setB(getMinB());
+	ValueTuple finalMin = new ValueTuple(getMinA(), getMinB());
+	final LinkedList<Graph> graphs2 = getGraphs();
+	for (final Graph graph : graphs2) {
+	    finalMin = createFinalMinForGraph(finalMin, graph);
 	}
 	return finalMin;
     }
@@ -356,7 +416,7 @@ public class GraphPanel extends JPanel {
      * 
      * @return
      */
-    private GraphListener createGraphListener() {
+    private GraphListener createGraphListener(final Graph graphRef) {
 	return new GraphListener() {
 	    @Override
 	    public void graphChanged() {
@@ -364,7 +424,7 @@ public class GraphPanel extends JPanel {
 		SwingUtilities.invokeLater(new Runnable() {
 		    @Override
 		    public void run() {
-			updateForNewGraph(GraphPanel.this.graph);
+			updateForNewGraph(graphRef);
 			updateScales();
 			repaint();
 		    }
@@ -409,11 +469,18 @@ public class GraphPanel extends JPanel {
     }
 
     /**
-     * @return {@link Graph} the graph.
+     * @return the graphs
      */
-    public final Graph getGraph() {
-	return this.graph;
+    public LinkedList<Graph> getGraphs() {
+	return this.graphs;
     }
+
+    // /**
+    // * @return {@link Graph} the graph.
+    // */
+    // public final Graph getGraph() {
+    // return this.graph;
+    // }
 
     public Double getMaxA() {
 	return this.maxA;
@@ -456,7 +523,6 @@ public class GraphPanel extends JPanel {
      * 
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected void paintComponent(final Graphics g) {
 	final Graphics2D g2d = (Graphics2D) g;
@@ -486,21 +552,9 @@ public class GraphPanel extends JPanel {
 	g.drawLine(origin.x, 0, origin.x, getHeight());
 
 	try {
-	    if (getGraph() != null) {
-		ValueTuple last = null;
-		final Iterator<ValueTuple> iterator;
-		synchronized (getGraph().getTuples()) {
-		    iterator = ((LinkedList<ValueTuple>) getGraph().getTuples()
-			    .clone()).iterator();
-		}
-		g.setColor(getGraph().getColor());
-		g2d.setStroke(new BasicStroke(getGraph().getStrokeWidth()));
-		while (iterator.hasNext()) {
-		    final ValueTuple next = iterator.next();
-		    if (last != null) {
-			paintPart(g, last, next, origin, offset);
-		    }
-		    last = next;
+	    if ((getGraphs() != null) && !getGraphs().isEmpty()) {
+		for (final Graph graphRef : getGraphs()) {
+		    paintGraph(g, g2d, origin, offset, graphRef);
 		}
 	    }
 	} catch (final Throwable t) {
@@ -564,6 +618,33 @@ public class GraphPanel extends JPanel {
 
     /**
      * @param g
+     * @param g2d
+     * @param origin
+     * @param offset
+     * @param graphRef
+     */
+    private void paintGraph(final Graphics g, final Graphics2D g2d,
+	    final Point origin, final Point offset, final Graph graphRef) {
+	ValueTuple last = null;
+	final Iterator<ValueTuple> iterator;
+	synchronized (graphRef.getTuples()) {
+	    iterator = ((LinkedList<ValueTuple>) graphRef.getTuples().clone())
+		    .iterator();
+	}
+	g.setColor(graphRef.getColor());
+	g2d.setStroke(new BasicStroke(graphRef.getStrokeWidth()));
+	while (iterator.hasNext()) {
+	    final ValueTuple next = iterator.next();
+	    if (last != null) {
+		paintPart(g, last, next, origin, offset, graphRef.getColor(),
+			graphRef.getFillColor());
+	    }
+	    last = next;
+	}
+    }
+
+    /**
+     * @param g
      *            {@link Graphics}
      * @param last
      *            {@link ValueTuple}
@@ -575,11 +656,11 @@ public class GraphPanel extends JPanel {
      *            {@link Point}
      */
     protected void paintPart(final Graphics g, final ValueTuple last,
-	    final ValueTuple next, final Point origin, final Point offset) {
+	    final ValueTuple next, final Point origin, final Point offset,
+	    final Color color, final Color fillColor) {
 	final Point p1 = calcDrawingPos(offset, last);
 	final Point p2 = calcDrawingPos(offset, next);
 
-	final Color fillColor = getGraph().getFillColor();
 	if (fillColor != null) {
 	    g.setColor(fillColor);
 	    final int y0 = calcDrawingYForB(offset, 0);
@@ -587,7 +668,7 @@ public class GraphPanel extends JPanel {
 		    new int[] { y0, p1.y, p2.y, y0 }, 4));
 	}
 
-	g.setColor(getGraph().getColor());
+	g.setColor(color);
 	g.drawLine(p1.x, p1.y, p2.x, p2.y);
     }
 
@@ -626,28 +707,11 @@ public class GraphPanel extends JPanel {
     }
 
     /**
-     * @param graphRef
-     *            {@link Graph} the graph to set.
+     * @param graphs
+     *            the graphs to set
      */
-    public final void setGraph(final Graph graphRef) {
-	if (this.graph != null) {
-	    this.graph.removeListener(this.graphListener);
-	    this.graph = null;
-	}
-	this.graph = graphRef;
-	if (this.graph != null) {
-	    if (this.graphListener == null) {
-		this.graphListener = createGraphListener();
-	    }
-	    this.graph.addListener(this.graphListener);
-	}
-	final Dimension size = getVisibleRect().getSize();
-	setMinimumSize(new Dimension(100, 100));
-	setPreferredSize(size);
-	setSize(size);
-	updateForNewGraph(graphRef);
-	updateScales();
-	repaint();
+    public void setGraphs(final LinkedList<Graph> graphs) {
+	this.graphs = graphs;
     }
 
     /**
