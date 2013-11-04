@@ -68,6 +68,7 @@ public final class ExampleGraphPanel {
     private static Graph createDummyGraph(final Color color,
 	    final Color fillColor) {
 	final Graph graphRef1 = new Graph();
+	graphRef1.setMaxNumberOfValues(15);
 	graphRef1.addTuple(new ValueTuple(0, 50));
 	graphRef1.setColor(color);
 	graphRef1.setFillColor(fillColor);

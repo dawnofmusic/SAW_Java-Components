@@ -96,42 +96,6 @@ public class GraphPanel extends JPanel {
     public static final BasicStroke SIMPLE_STROKE = new BasicStroke(1f);
 
     /**
-     * @param panelConstraints
-     * @param graphRef
-     * @return
-     */
-    private static ValueTuple createFinalMaxForGraph(
-	    final ValueTuple panelConstraints, final Graph graphRef) {
-	final ValueTuple finalMax = new ValueTuple(graphRef.getMaxA(),
-		graphRef.getMaxB());
-	if (panelConstraints.getA() > graphRef.getMaxA()) {
-	    finalMax.setA(panelConstraints.getA());
-	}
-	if (panelConstraints.getB() > graphRef.getMaxB()) {
-	    finalMax.setB(panelConstraints.getB());
-	}
-	return finalMax;
-    }
-
-    /**
-     * @param panelConstraints
-     * @param graphRef
-     * @return
-     */
-    private static ValueTuple createFinalMinForGraph(
-	    final ValueTuple panelConstraints, final Graph graphRef) {
-	final ValueTuple finalMin = new ValueTuple(graphRef.getMinA(),
-		graphRef.getMinB());
-	if (panelConstraints.getA() < graphRef.getMinA()) {
-	    finalMin.setA(panelConstraints.getA());
-	}
-	if (panelConstraints.getB() < graphRef.getMinB()) {
-	    finalMin.setB(panelConstraints.getB());
-	}
-	return finalMin;
-    }
-
-    /**
      * {@link String} COMMENT.
      */
     private String backgroundTitle = ""; //$NON-NLS-1$
@@ -140,11 +104,6 @@ public class GraphPanel extends JPanel {
      * {@link Formatter} COMMENT.
      */
     private Formatter formaterA = GraphPanel.DEFAULT_FORMATTER;
-
-    // /**
-    // * {@link Graph} COMMENT.
-    // */
-    // private Graph graph = null;
 
     /**
      * {@link Formatter} COMMENT.
@@ -155,6 +114,11 @@ public class GraphPanel extends JPanel {
      * {@link LinkedList<Function>} COMMENT.
      */
     private LinkedList<FunctionToPlot> functionsToPlot = new LinkedList<FunctionToPlot>();
+
+    // /**
+    // * {@link Graph} COMMENT.
+    // */
+    // private Graph graph = null;
 
     /** {@link GraphListener} The graphListener. */
     private GraphListener graphListener;
@@ -380,11 +344,27 @@ public class GraphPanel extends JPanel {
 	    return new ValueTuple(getMaxA() != null ? getMaxA() : 1,
 		    getMaxB() != null ? getMaxB() : 1);
 	}
-	ValueTuple finalMax = new ValueTuple(getMaxA() != null ? getMaxA() : 1,
-		getMaxB() != null ? getMaxB() : 1);
+	ValueTuple finalMax = new ValueTuple(1, 1);
 	final LinkedList<Graph> graphs2 = getGraphs();
 	for (final Graph graph : graphs2) {
-	    finalMax = createFinalMaxForGraph(finalMax, graph);
+	    finalMax = createFinalMaxForGraph(graph);
+	}
+	return finalMax;
+    }
+
+    /**
+     * @param panelConstraints
+     * @param graphRef
+     * @return
+     */
+    private ValueTuple createFinalMaxForGraph(final Graph graphRef) {
+	final ValueTuple finalMax = new ValueTuple(graphRef.getMaxA(),
+		graphRef.getMaxB());
+	if ((getMaxA() != null) && (getMaxA() > graphRef.getMaxA())) {
+	    finalMax.setA(getMaxA());
+	}
+	if ((getMaxB() != null) && (getMaxB() > graphRef.getMaxB())) {
+	    finalMax.setB(getMaxB());
 	}
 	return finalMax;
     }
@@ -397,11 +377,27 @@ public class GraphPanel extends JPanel {
 	    return new ValueTuple(getMinA() != null ? getMinA() : 0,
 		    getMinB() != null ? getMinB() : 0);
 	}
-	ValueTuple finalMin = new ValueTuple(getMinA() != null ? getMinA() : 0,
-		getMinB() != null ? getMinB() : 0);
+	ValueTuple finalMin = new ValueTuple(0, 0);
 	final LinkedList<Graph> graphs2 = getGraphs();
 	for (final Graph graph : graphs2) {
-	    finalMin = createFinalMinForGraph(finalMin, graph);
+	    finalMin = createFinalMinForGraph(graph);
+	}
+	return finalMin;
+    }
+
+    /**
+     * @param panelConstraints
+     * @param graphRef
+     * @return
+     */
+    private ValueTuple createFinalMinForGraph(final Graph graphRef) {
+	final ValueTuple finalMin = new ValueTuple(graphRef.getMinA(),
+		graphRef.getMinB());
+	if ((getMinA() != null) && (getMinA() < graphRef.getMinA())) {
+	    finalMin.setA(getMinA());
+	}
+	if ((getMinB() != null) && (getMinB() < graphRef.getMinB())) {
+	    finalMin.setB(getMinB());
 	}
 	return finalMin;
     }
@@ -414,9 +410,10 @@ public class GraphPanel extends JPanel {
 	final ValueTuple fmin = createFinalMin();
 	final ValueTuple range = new ValueTuple(fmax.getA() - fmin.getA(),
 		fmax.getB() - fmin.getB());
-	if (LOG.isDebugEnabled()) {
-	    LOG.debug("range calculation [fmax: " + fmax + ", fmin: " + fmin //$NON-NLS-1$ //$NON-NLS-2$
-		    + ", range: " + range + "]."); //$NON-NLS-1$//$NON-NLS-2$
+	if (GraphPanel.LOG.isDebugEnabled()) {
+	    GraphPanel.LOG
+		    .debug("range calculation [fmax: " + fmax + ", fmin: " + fmin //$NON-NLS-1$ //$NON-NLS-2$
+			    + ", range: " + range + "]."); //$NON-NLS-1$//$NON-NLS-2$
 	}
 	return range;
     }

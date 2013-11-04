@@ -2,8 +2,6 @@ package de.wsdevel.components.plotter;
 
 import java.awt.Color;
 import java.util.LinkedList;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,19 +21,6 @@ public class Graph {
      */
     private static final Log LOG = LogFactory.getLog(Graph.class);
 
-    /** {@link int} The maxNumberOfValues. */
-    private int maxNumberOfValues = -1;
-
-    /**
-     * {@link SortedSet<Double>} COMMENT.
-     */
-    private final SortedSet<Double> as = new TreeSet<Double>();
-
-    /**
-     * {@link SortedSet<Double>} COMMENT.
-     */
-    private final SortedSet<Double> bs = new TreeSet<Double>();
-
     /**
      * {@link Color} COMMENT.
      */
@@ -48,6 +33,17 @@ public class Graph {
      * {@link GraphListenerSupport} COMMENT.
      */
     private final GraphListenerSupport gls = new GraphListenerSupport();
+
+    /**
+     */
+    private double maxB = 0;
+
+    /** {@link int} The maxNumberOfValues. */
+    private int maxNumberOfValues = -1;
+
+    /**
+     */
+    private double minB = 0;
 
     /**
      * {@link float} COMMENT.
@@ -75,19 +71,19 @@ public class Graph {
     @SuppressWarnings("nls")
     public final void addTuple(final ValueTuple tuple) {
 	this.tuples.add(tuple);
-	this.as.add(tuple.getA());
-	this.bs.add(tuple.getB());
 	if (Graph.LOG.isDebugEnabled()) {
 	    Graph.LOG.debug("tuple added: " + tuple);
 	}
+	if (tuple.getB() > this.maxB) {
+	    this.maxB = tuple.getB();
+	}
+	if (tuple.getB() < this.minB) {
+	    this.minB = tuple.getB();
+	}
 	if ((getMaxNumberOfValues() > -1)
 		&& (this.tuples.size() > getMaxNumberOfValues())) {
-	    // SEBASTIAN what about the as and bs?
-	    // assume as are always increasing, at least remove a
-	    if (!this.as.remove(this.tuples.pollFirst().getA())) {
-		// System.out.println("[first: " + first.getA() + ", as: "
-		// + this.as + ", tuples: " + this.tuples + "]");
-	    }
+	    // (20131104 saw) assume a is always increasing, remove first tuple
+	    this.tuples.removeFirst();
 	}
 	this.gls.fireGraphChanged();
     }
@@ -130,12 +126,11 @@ public class Graph {
      * @return <code>double</code>
      */
     public final double getMaxA() {
-	if (this.as.size() > 0) {
-	    final Double last = this.as.last();
-	    if (last == null) {
-		return 0;
+	synchronized (this.tuples) {
+	    final ValueTuple peekLast = this.tuples.peekLast();
+	    if (peekLast != null) {
+		return peekLast.getA();
 	    }
-	    return last;
 	}
 	return 0;
     }
@@ -144,14 +139,7 @@ public class Graph {
      * @return <code>double</code>
      */
     public final double getMaxB() {
-	if (this.bs.size() > 0) {
-	    final Double last = this.bs.last();
-	    if (last == null) {
-		return 0;
-	    }
-	    return last;
-	}
-	return 0;
+	return this.maxB;
     }
 
     /**
@@ -167,12 +155,11 @@ public class Graph {
      * @return <code>double</code>
      */
     public final double getMinA() {
-	if (this.as.size() > 0) {
-	    final Double first = this.as.first();
-	    if (first == null) {
-		return 0;
+	synchronized (this.tuples) {
+	    final ValueTuple peekFirst = this.tuples.peekFirst();
+	    if (peekFirst != null) {
+		return peekFirst.getA();
 	    }
-	    return first;
 	}
 	return 0;
     }
@@ -181,14 +168,7 @@ public class Graph {
      * @return <code>double</code>
      */
     public final double getMinB() {
-	if (this.bs.size() > 0) {
-	    final Double first = this.bs.first();
-	    if (first == null) {
-		return 0;
-	    }
-	    return first;
-	}
-	return 0;
+	return this.minB;
     }
 
     /**
