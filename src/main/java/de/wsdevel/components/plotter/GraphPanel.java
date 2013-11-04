@@ -340,14 +340,12 @@ public class GraphPanel extends JPanel {
      * @return {@link ValueTuple}
      */
     private ValueTuple createFinalMax() {
-	if ((getGraphs() == null) || getGraphs().isEmpty()) {
-	    return new ValueTuple(getMaxA() != null ? getMaxA() : 1,
-		    getMaxB() != null ? getMaxB() : 1);
-	}
 	ValueTuple finalMax = new ValueTuple(1, 1);
 	final LinkedList<Graph> graphs2 = getGraphs();
-	for (final Graph graph : graphs2) {
-	    finalMax = createFinalMaxForGraph(graph);
+	if (graphs2 != null) {
+	    for (final Graph graph : graphs2) {
+		finalMax = createFinalMaxForGraph(graph);
+	    }
 	}
 	return finalMax;
     }
@@ -373,14 +371,12 @@ public class GraphPanel extends JPanel {
      * @return {@link ValueTuple}
      */
     private ValueTuple createFinalMin() {
-	if ((getGraphs() == null) || getGraphs().isEmpty()) {
-	    return new ValueTuple(getMinA() != null ? getMinA() : 0,
-		    getMinB() != null ? getMinB() : 0);
-	}
 	ValueTuple finalMin = new ValueTuple(0, 0);
 	final LinkedList<Graph> graphs2 = getGraphs();
-	for (final Graph graph : graphs2) {
-	    finalMin = createFinalMinForGraph(graph);
+	if (graphs2 != null) {
+	    for (final Graph graph : graphs2) {
+		finalMin = createFinalMinForGraph(graph);
+	    }
 	}
 	return finalMin;
     }

@@ -30,9 +30,10 @@ public final class ExampleGraphPanel {
 	BasicConfigurator.configure();
 
 	final Graph graphRef1 = createDummyGraph(Color.red, new Color(0, 255,
-		0, 128));
+		0, 128), 1024 * 1024);
+
 	final Graph graphRef2 = createDummyGraph(Color.BLUE, new Color(255, 0,
-		255, 128));
+		255, 128), 3 * 7 * 41);
 
 	final JFrame frame = new JFrame("Example GraphPanel"); //$NON-NLS-1$
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -66,7 +67,7 @@ public final class ExampleGraphPanel {
      * @return
      */
     private static Graph createDummyGraph(final Color color,
-	    final Color fillColor) {
+	    final Color fillColor, final long seed) {
 	final Graph graphRef1 = new Graph();
 	graphRef1.setMaxNumberOfValues(15);
 	graphRef1.addTuple(new ValueTuple(0, 50));
@@ -74,7 +75,7 @@ public final class ExampleGraphPanel {
 	graphRef1.setFillColor(fillColor);
 
 	final long startMillis = System.currentTimeMillis();
-	final Random random = new Random(startMillis);
+	final Random random = new Random(seed);
 
 	final Timer timer = new Timer();
 	timer.schedule(new TimerTask() {
