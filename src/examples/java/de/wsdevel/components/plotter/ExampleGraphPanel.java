@@ -17,6 +17,8 @@ import javax.swing.WindowConstants;
 
 import org.apache.log4j.BasicConfigurator;
 
+import de.wsdevel.tools.math.ValueTuple;
+
 /**
  * @author Sebastian A. Weiss
  * 
@@ -29,10 +31,10 @@ public final class ExampleGraphPanel {
     public static void main(String[] args) {
 	BasicConfigurator.configure();
 
-	final Graph graphRef1 = createDummyGraph(Color.red, new Color(0, 255,
+	final GraphForComponent graphRef1 = createDummyGraph(Color.red, new Color(0, 255,
 		0, 128), 1024 * 1024);
 
-	final Graph graphRef2 = createDummyGraph(Color.BLUE, new Color(255, 0,
+	final GraphForComponent graphRef2 = createDummyGraph(Color.BLUE, new Color(255, 0,
 		255, 128), 3 * 7 * 41);
 
 	final JFrame frame = new JFrame("Example GraphPanel"); //$NON-NLS-1$
@@ -66,9 +68,9 @@ public final class ExampleGraphPanel {
      * @param fillColor
      * @return
      */
-    private static Graph createDummyGraph(final Color color,
+    private static GraphForComponent createDummyGraph(final Color color,
 	    final Color fillColor, final long seed) {
-	final Graph graphRef1 = new Graph();
+	final GraphForComponent graphRef1 = new GraphForComponent();
 	graphRef1.setMaxNumberOfValues(15);
 	graphRef1.addTuple(new ValueTuple(0, 50));
 	graphRef1.setColor(color);

@@ -29,6 +29,10 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.wsdevel.tools.math.Graph;
+import de.wsdevel.tools.math.GraphListener;
+import de.wsdevel.tools.math.ValueTuple;
+
 /**
  * Created on 27.03.2009.
  * 
@@ -124,9 +128,9 @@ public class GraphPanel extends JPanel {
     private GraphListener graphListener;
 
     /**
-     * {@link LinkedList}< {@link Graph}> graphs.
+     * {@link LinkedList}< {@link GraphForComponent}> graphs.
      */
-    private LinkedList<Graph> graphs = new LinkedList<Graph>();
+    private LinkedList<GraphForComponent> graphs = new LinkedList<GraphForComponent>();
 
     /** {@link Double} maximum value of a. */
     private Double maxA = null;
@@ -226,9 +230,9 @@ public class GraphPanel extends JPanel {
 
     /**
      * @param graphRef
-     *            {@link Graph}
+     *            {@link GraphForComponent}
      */
-    public GraphPanel(final Graph graphRef) {
+    public GraphPanel(final GraphForComponent graphRef) {
 	this();
 	addGraph(graphRef);
     }
@@ -245,9 +249,9 @@ public class GraphPanel extends JPanel {
 
     /**
      * @param graphRef
-     *            {@link Graph} the graph to set.
+     *            {@link GraphForComponent} the graph to set.
      */
-    public final void addGraph(final Graph graphRef) {
+    public final void addGraph(final GraphForComponent graphRef) {
 	// if (this.graph != null) {
 	// this.graph.removeListener(this.graphListener);
 	// this.graph = null;
@@ -341,7 +345,7 @@ public class GraphPanel extends JPanel {
      */
     private ValueTuple createFinalMax() {
 	ValueTuple finalMax = new ValueTuple(1, 1);
-	final LinkedList<Graph> graphs2 = getGraphs();
+	final LinkedList<GraphForComponent> graphs2 = getGraphs();
 	if (graphs2 != null) {
 	    for (final Graph graph : graphs2) {
 		finalMax = createFinalMaxForGraph(graph);
@@ -372,7 +376,7 @@ public class GraphPanel extends JPanel {
      */
     private ValueTuple createFinalMin() {
 	ValueTuple finalMin = new ValueTuple(0, 0);
-	final LinkedList<Graph> graphs2 = getGraphs();
+	final LinkedList<GraphForComponent> graphs2 = getGraphs();
 	if (graphs2 != null) {
 	    for (final Graph graph : graphs2) {
 		finalMin = createFinalMinForGraph(graph);
@@ -474,7 +478,7 @@ public class GraphPanel extends JPanel {
     /**
      * @return the graphs
      */
-    public LinkedList<Graph> getGraphs() {
+    public LinkedList<GraphForComponent> getGraphs() {
 	return this.graphs;
     }
 
@@ -549,7 +553,7 @@ public class GraphPanel extends JPanel {
 
 	try {
 	    if ((getGraphs() != null) && !getGraphs().isEmpty()) {
-		for (final Graph graphRef : getGraphs()) {
+		for (final GraphForComponent graphRef : getGraphs()) {
 		    paintGraph(g, g2d, origin, offset, graphRef);
 		}
 	    }
@@ -620,11 +624,12 @@ public class GraphPanel extends JPanel {
      * @param graphRef
      */
     private void paintGraph(final Graphics g, final Graphics2D g2d,
-	    final Point origin, final Point offset, final Graph graphRef) {
+	    final Point origin, final Point offset,
+	    final GraphForComponent graphRef) {
 	ValueTuple last = null;
 	final Iterator<ValueTuple> iterator;
 	synchronized (graphRef.getTuples()) {
-	    iterator = ((LinkedList<ValueTuple>) graphRef.getTuples().clone())
+	    iterator = new LinkedList<ValueTuple>(graphRef.getTuples())
 		    .iterator();
 	}
 	g.setColor(graphRef.getColor());
@@ -706,7 +711,7 @@ public class GraphPanel extends JPanel {
      * @param graphs
      *            the graphs to set
      */
-    public void setGraphs(final LinkedList<Graph> graphs) {
+    public void setGraphs(final LinkedList<GraphForComponent> graphs) {
 	this.graphs = graphs;
     }
 
@@ -763,7 +768,7 @@ public class GraphPanel extends JPanel {
      * graph instance.
      * 
      * @param graphRef
-     *            {@link Graph}
+     *            {@link GraphForComponent}
      */
     protected void updateForNewGraph(final Graph graphRef) {
 	// to be implemented by subclasses (sw)
