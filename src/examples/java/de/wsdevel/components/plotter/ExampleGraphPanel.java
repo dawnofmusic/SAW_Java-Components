@@ -17,6 +17,7 @@ import javax.swing.WindowConstants;
 
 import org.apache.log4j.BasicConfigurator;
 
+import de.wsdevel.tools.math.Graph;
 import de.wsdevel.tools.math.ValueTuple;
 
 /**
@@ -31,11 +32,11 @@ public final class ExampleGraphPanel {
     public static void main(String[] args) {
 	BasicConfigurator.configure();
 
-	final GraphForComponent graphRef1 = createDummyGraph(Color.red, new Color(0, 255,
-		0, 128), 1024 * 1024);
+	final GraphForComponent graphRef1 = createDummyGraph(Color.red,
+		new Color(0, 255, 0, 128), 1024 * 1024);
 
-	final GraphForComponent graphRef2 = createDummyGraph(Color.BLUE, new Color(255, 0,
-		255, 128), 3 * 7 * 41);
+	final GraphForComponent graphRef2 = createDummyGraph(Color.BLUE,
+		new Color(255, 0, 255, 128), 3 * 7 * 41);
 
 	final JFrame frame = new JFrame("Example GraphPanel"); //$NON-NLS-1$
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -70,9 +71,10 @@ public final class ExampleGraphPanel {
      */
     private static GraphForComponent createDummyGraph(final Color color,
 	    final Color fillColor, final long seed) {
-	final GraphForComponent graphRef1 = new GraphForComponent();
-	graphRef1.setMaxNumberOfValues(15);
-	graphRef1.addTuple(new ValueTuple(0, 50));
+	final Graph modelRef = new Graph();
+	modelRef.setMaxNumberOfValues(15);
+	modelRef.addTuple(new ValueTuple(0, 50));
+	final GraphForComponent graphRef1 = new GraphForComponent(modelRef);
 	graphRef1.setColor(color);
 	graphRef1.setFillColor(fillColor);
 
