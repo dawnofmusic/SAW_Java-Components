@@ -73,7 +73,7 @@ public final class ExampleGraphPanel {
 	    final Color fillColor, final long seed) {
 	final Graph modelRef = new Graph();
 	modelRef.setMaxNumberOfValues(15);
-	modelRef.addTuple(new ValueTuple(0, 50));
+	modelRef.addTuple(new ValueTuple(0d, 50d));
 	final GraphForComponent graphRef1 = new GraphForComponent(modelRef);
 	graphRef1.setColor(color);
 	graphRef1.setFillColor(fillColor);

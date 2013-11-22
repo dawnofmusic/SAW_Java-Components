@@ -33,65 +33,52 @@ import de.wsdevel.tools.math.ValueTuple;
  */
 public class GraphPanel extends JPanel {
 
-    /**
-     * {@link Log} the logger.
-     */
+    /** {@link Log} LOG */
     private static final Log LOG = LogFactory.getLog(GraphPanel.class);
 
-    /**
-     * {@link long} COMMENT.
-     */
+    /** {@link long} serialVersionUID */
     private static final long serialVersionUID = -8612195651541083392L;
 
-    /**
-     * {@link BasicStroke} COMMENT.
-     */
+    /** {@link BasicStroke} SIMPLE_STROKE */
     public static final BasicStroke SIMPLE_STROKE = new BasicStroke(1f);
 
-    /**
-     * {@link String} COMMENT.
-     */
+    /** {@link String} backgroundTitle */
     private String backgroundTitle = ""; //$NON-NLS-1$
 
+    /** {@link ValueTuple} finalMax */
     private ValueTuple finalMax;
 
+    /** {@link ValueTuple} finalMin */
     private ValueTuple finalMin;
 
+    /** {@link ValueTuple} finalValueRange */
     private ValueTuple finalValueRange;
 
-    /**
-     * {@link Formatter} COMMENT.
-     */
-    private Formatter formaterA = GraphPlotter.DEFAULT_FORMATTER;
+    /** {@link Formatter} formatterA */
+    private Formatter formatterA = GraphPlotter.DEFAULT_FORMATTER;
 
-    /**
-     * {@link Formatter} COMMENT.
-     */
-    private Formatter formaterB = GraphPlotter.DEFAULT_FORMATTER;
+    /** {@link Formatter} formatterB */
+    private Formatter formatterB = GraphPlotter.DEFAULT_FORMATTER;
 
-    /**
-     * {@link LinkedList<Function>} COMMENT.
-     */
+    /** {@link LinkedList<FunctionToPlot>} functionsToPlot */
     private LinkedList<FunctionToPlot> functionsToPlot = new LinkedList<FunctionToPlot>();
 
     /** {@link GraphListener} The graphListener. */
     private GraphListener graphListener;
 
-    /**
-     * {@link LinkedList}< {@link GraphForComponent}> graphs.
-     */
+    /** {@link LinkedList<GraphForComponent>} graphs */
     private LinkedList<GraphForComponent> graphs = new LinkedList<GraphForComponent>();
 
+    /** {@link GraphViewConstraints} graphViewConstraints */
+    private GraphViewConstraints graphViewConstraints;
+
+    /** {@link ValueTuple} scale */
     private ValueTuple scale;
 
-    /**
-     * <code>int</code> COMMENT.
-     */
+    /** {@link int} stepCountA */
     private int stepCountA = 0;
 
-    /**
-     * <code>int</code> COMMENT.
-     */
+    /** {@link int} stepCountB */
     private int stepCountB = 5;
 
     /**
@@ -115,6 +102,7 @@ public class GraphPanel extends JPanel {
 		repaint();
 	    }
 	});
+	setGraphViewConstraints(new GraphViewConstraints());
 	final JLabel label = new JLabel();
 	label.setOpaque(false);
 	label.setSize(100, 20);
@@ -148,12 +136,12 @@ public class GraphPanel extends JPanel {
 		label.setLocation(newX, e.getY());
 
 		label.setText("["
-			+ getFormaterA().format(
+			+ getFormatterA().format(
 				calcAForMouseX(e.getX(),
 					GraphPanel.this.finalMin,
 					GraphPanel.this.scale))
 			+ ","
-			+ getFormaterB().format(
+			+ getFormatterB().format(
 				(GraphPlotter.calcOrigin(GraphPlotter
 					.calcOffset(GraphPanel.this.finalMin,
 						GraphPanel.this.scale),
@@ -187,11 +175,6 @@ public class GraphPanel extends JPanel {
      *            {@link GraphForComponent} the graph to set.
      */
     public final void addGraph(final GraphForComponent graphRef) {
-	// if (this.graph != null) {
-	// this.graph.removeListener(this.graphListener);
-	// this.graph = null;
-	// }
-	// this.graph = graphRef;
 	if (graphRef != null) {
 	    if (this.graphListener == null) {
 		this.graphListener = createGraphListener(graphRef.getModel());
@@ -222,9 +205,11 @@ public class GraphPanel extends JPanel {
     }
 
     /**
-     * COMMENT.
+     * createGraphListener.
      * 
-     * @return
+     * @param graphRef
+     *            {@link Graph}
+     * @return {@link GraphListener}
      */
     private GraphListener createGraphListener(final Graph graphRef) {
 	return new GraphListener() {
@@ -258,17 +243,17 @@ public class GraphPanel extends JPanel {
     }
 
     /**
-     * @return {@link Formatter} the formaterA.
+     * @return {@link Formatter} the formatterA.
      */
-    public final Formatter getFormaterA() {
-	return this.formaterA;
+    public final Formatter getFormatterA() {
+	return this.formatterA;
     }
 
     /**
-     * @return {@link Formatter} the formaterB.
+     * @return {@link Formatter} the formatterB.
      */
-    public final Formatter getFormaterB() {
-	return this.formaterB;
+    public final Formatter getFormatterB() {
+	return this.formatterB;
     }
 
     /**
@@ -283,6 +268,13 @@ public class GraphPanel extends JPanel {
      */
     public LinkedList<GraphForComponent> getGraphs() {
 	return this.graphs;
+    }
+
+    /**
+     * @return the {@link GraphViewConstraints} graphViewConstraints
+     */
+    public GraphViewConstraints getGraphViewConstraints() {
+	return this.graphViewConstraints;
     }
 
     /**
@@ -307,8 +299,9 @@ public class GraphPanel extends JPanel {
     @Override
     protected void paintComponent(final Graphics g) {
 	GraphPlotter.paintComponent(getSize(), g, getBackgroundTitle(),
-		getFormaterA(), getFormaterB(), getGraphs(),
-		getFunctionsToPlot(), getStepCountA(), getStepCountB());
+		getFormatterA(), getFormatterB(), getGraphs(),
+		getFunctionsToPlot(), getStepCountA(), getStepCountB(),
+		getGraphViewConstraints());
     }
 
     /**
@@ -324,16 +317,16 @@ public class GraphPanel extends JPanel {
      * @param formaterARef
      *            {@link Formatter} the formaterA to set.
      */
-    public final void setFormaterA(final Formatter formaterARef) {
-	this.formaterA = formaterARef;
+    public final void setFormatterA(final Formatter formaterARef) {
+	this.formatterA = formaterARef;
     }
 
     /**
      * @param formaterBRef
      *            {@link Formatter} the formaterB to set.
      */
-    public final void setFormaterB(final Formatter formaterBRef) {
-	this.formaterB = formaterBRef;
+    public final void setFormatterB(final Formatter formaterBRef) {
+	this.formatterB = formaterBRef;
     }
 
     /**
@@ -351,6 +344,15 @@ public class GraphPanel extends JPanel {
      */
     public void setGraphs(final LinkedList<GraphForComponent> graphs) {
 	this.graphs = graphs;
+    }
+
+    /**
+     * @param graphViewConstraints
+     *            {@link GraphViewConstraints} the graphViewConstraints to set
+     */
+    public void setGraphViewConstraints(
+	    final GraphViewConstraints graphViewConstraints) {
+	this.graphViewConstraints = graphViewConstraints;
     }
 
     /**
@@ -384,8 +386,10 @@ public class GraphPanel extends JPanel {
      * Updating scale factors.
      */
     private void updateScales() {
-	this.finalMin = GraphPlotter.createFinalMin(getGraphs());
-	this.finalMax = GraphPlotter.createFinalMax(getGraphs());
+	this.finalMin = GraphPlotter.createFinalMin(getGraphs(),
+		getGraphViewConstraints());
+	this.finalMax = GraphPlotter.createFinalMax(getGraphs(),
+		getGraphViewConstraints());
 	this.finalValueRange = GraphPlotter.createFinalValueRange(
 		this.finalMin, this.finalMax);
 	this.scale = GraphPlotter.calcScale(getSize(), this.finalValueRange);

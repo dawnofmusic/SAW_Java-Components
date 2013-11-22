@@ -155,38 +155,49 @@ public class GraphPlotter {
     /**
      * COMMENT.
      * 
+     * @param graphViewConstraints
+     *            {@link GraphViewConstraints}
+     * 
      * @return {@link ValueTuple}
      */
     public static ValueTuple createFinalMax(
-	    final LinkedList<GraphForComponent> graphs2) {
-	ValueTuple finalMax = new ValueTuple(1, 1);
+	    final LinkedList<GraphForComponent> graphs2,
+	    GraphViewConstraints graphViewConstraints) {
+	ValueTuple finalMax = new ValueTuple(graphViewConstraints.getMaxA(),
+		graphViewConstraints.getMaxB());
 	if (graphs2 != null) {
 	    for (final GraphForComponent graph : graphs2) {
 		final Graph graphRef = graph.getModel();
 		finalMax = new ValueTuple(
-			finalMax.getA() > graphRef.getMaxA() ? finalMax.getA()
-				: graphRef.getMaxA(),
-			finalMax.getB() > graphRef.getMaxB() ? finalMax.getB()
-				: graphRef.getMaxB());
+			(finalMax.getA() != null && finalMax.getA() > graphRef
+				.getMaxA()) ? finalMax.getA() : graphRef
+				.getMaxA(),
+			(finalMax.getB() != null && finalMax.getB() > graphRef
+				.getMaxB()) ? finalMax.getB() : graphRef
+				.getMaxB());
 	    }
 	}
 	return finalMax;
     }
 
     /**
+     * @param graphViewConstraints
+     *            {@link GraphViewConstraints}
      * @return {@link ValueTuple}
      */
     public static ValueTuple createFinalMin(
-	    final LinkedList<GraphForComponent> graphs2) {
-	ValueTuple finalMin = null;
+	    final LinkedList<GraphForComponent> graphs2,
+	    GraphViewConstraints graphViewConstraints) {
+	ValueTuple finalMin = new ValueTuple(graphViewConstraints.getMinA(),
+		graphViewConstraints.getMinB());
 	if (graphs2 != null) {
 	    for (final GraphForComponent graph : graphs2) {
 		final Graph graphRef = graph.getModel();
 		finalMin = new ValueTuple(
-			(finalMin != null && finalMin.getA() < graphRef
+			(finalMin.getA() != null && finalMin.getA() < graphRef
 				.getMinA()) ? finalMin.getA() : graphRef
 				.getMinA(),
-			(finalMin != null && finalMin.getB() < graphRef
+			(finalMin.getB() != null && finalMin.getB() < graphRef
 				.getMinB()) ? finalMin.getB() : graphRef
 				.getMinB());
 	    }
@@ -228,13 +239,16 @@ public class GraphPlotter {
      *            <code>int</code>
      * @param stepCountB
      *            <code>int</code>
+     * @param graphViewConstraints
+     *            {@link GraphViewConstraints}
      */
     public static void paintComponent(final Dimension size, final Graphics g,
 	    final String backgroundTitle, final Formatter formatterA,
 	    final Formatter formatterB,
 	    final LinkedList<GraphForComponent> graphs,
 	    final LinkedList<FunctionToPlot> functionsToPlot,
-	    final int stepCountA, final int stepCountB) {
+	    final int stepCountA, final int stepCountB,
+	    final GraphViewConstraints graphViewConstraints) {
 	final Graphics2D g2d = (Graphics2D) g;
 	g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 		RenderingHints.VALUE_ANTIALIAS_ON);
@@ -243,8 +257,8 @@ public class GraphPlotter {
 	g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
 		RenderingHints.VALUE_STROKE_NORMALIZE);
 
-	final ValueTuple finalMin = createFinalMin(graphs);
-	final ValueTuple finalMax = createFinalMax(graphs);
+	final ValueTuple finalMin = createFinalMin(graphs, graphViewConstraints);
+	final ValueTuple finalMax = createFinalMax(graphs, graphViewConstraints);
 	final ValueTuple fvr = createFinalValueRange(finalMin, finalMax);
 	final ValueTuple scale = calcScale(size, fvr);
 
@@ -299,12 +313,12 @@ public class GraphPlotter {
 	    g.setColor(Color.BLACK);
 	    g.setFont(GraphPlotter.DEFAULT_FONT);
 
-	    final ValueTuple fm = createFinalMin(graphs);
+	    final ValueTuple fm = createFinalMin(graphs, graphViewConstraints);
 	    double stepsWidth = fvr.getB() / (stepCountB + 1.0d);
 	    for (int i = 1; i < (stepCountB + 1); i++) {
 		final double val = (stepsWidth * i) + fm.getB();
 		final Point calcDrawingPos = calcDrawingPos(offset,
-			new ValueTuple(0, val), size.height, scale);
+			new ValueTuple(0d, val), size.height, scale);
 		g.drawString(formatterB.format(val), 5, calcDrawingPos.y
 			+ g.getFontMetrics().getMaxAscent());
 	    }
@@ -319,7 +333,7 @@ public class GraphPlotter {
 	    for (int i = 0; i < stepCount; i++) {
 		final double val = (stepsWidth * i) + fm.getA();
 		final Point calcDrawingPos = calcDrawingPos(offset,
-			new ValueTuple(val, 0), size.height, scale);
+			new ValueTuple(val, 0d), size.height, scale);
 		g.drawString(formatterA.format(val), calcDrawingPos.x + 5,
 			origin.y - 5);
 
